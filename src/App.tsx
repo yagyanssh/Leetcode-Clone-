@@ -6,6 +6,8 @@ import { Signin } from './components/Signin';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useEffect } from 'react';
 import firebase from 'firebase/compat/app';
+import { RecoilRoot, useRecoilState, useSetRecoilState } from 'recoil';
+import { userAtom } from './Store/atoms/user';
 
 
 
@@ -24,12 +26,43 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);  
 export const auth = getAuth(app)
 function App() {
-  
+  return <RecoilRoot>
+    <StoreApp />
+  </RecoilRoot>
+} 
+
+function StoreApp(){
+  const [ user , setUser ] = useRecoilState(userAtom);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, function(user) {
+      if(user && user.email) {
+        setUser({
+          loading: false,
+          user: {
+            email: user.email
+          }
+        })
+
+        }else{
+        setUser({
+          loading: false,
+        })
+        // no user os signed in
+        console.log("There is no logged in user")
+      }
+    });
+  }, [])
+  if(user.loading){
+    return<div>loading....</div>
+  }
+  if(!user){
+    return<div><Signin /></div>
+  }
+
   return (
     <>
-      <div className="text-3xl font-bold underline">
-        < Signin/>
-      </div>
+      You are logged in as {user.user?.email}
     </>
   )
 }
