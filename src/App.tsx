@@ -8,6 +8,8 @@ import { useEffect } from 'react';
 import firebase from 'firebase/compat/app';
 import { RecoilRoot, useRecoilState, useSetRecoilState } from 'recoil';
 import { userAtom } from './Store/atoms/user';
+import { Topbar } from "./components/Topbar";
+import { Card } from './components/Card';
 
 
 
@@ -35,36 +37,43 @@ function StoreApp(){
   const [ user , setUser ] = useRecoilState(userAtom);
 
   useEffect(() => {
-    onAuthStateChanged(auth, function(user) {
-      if(user && user.email) {
+    onAuthStateChanged(auth, function (user) {
+      if (user && user.email) {
         setUser({
           loading: false,
           user: {
-            email: user.email
-          }
-        })
-
-        }else{
+            email: user.email,
+          },
+        });
+      } else {
         setUser({
           loading: false,
-        })
-        // no user os signed in
-        console.log("There is no logged in user")
+        });
+        // No user is signed in.
+        console.log("There is no logged in user");
       }
     });
   }, [])
-  if(user.loading){
-    return<div>loading....</div>
-  }
-  if(!user){
-    return<div><Signin /></div>
-  }
 
+  if (user.loading) {
+    return <div>loading ...</div>;
+  }
+  
+  if (!user.user) {
+    return <div><Signin /></div>
+  }
+  
   return (
-    <>
-      You are logged in as {user.user?.email}
-    </>
+    <div className="place-items-center grid">
+      <div className="max-w-screen-lg w-full">
+        <Topbar />
+        
+        <Card>hi there</Card>
+
+      </div>
+      
+    </div>
   )
-}
+}  
 
 export default App
